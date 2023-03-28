@@ -13,7 +13,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import styles from "./VideoCard.module.scss";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
-import useOutsideClickHandler from "../../utils/useOutsideClickHandler";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createHistory,
@@ -33,9 +32,7 @@ const VideoCard = ({ item, setSelectedCards }) => {
   const [openIframe, setOpenIframe] = useState(false);
   const [data, setData] = useState(item);
   const ref = useRef();
-  useOutsideClickHandler(ref, () => {
-    setOpen(false);
-  });
+
   // just adding new item
   const [name, setName] = useState("");
   const inputRef = useRef(null);
@@ -101,22 +98,36 @@ const VideoCard = ({ item, setSelectedCards }) => {
         />
       </Card>
       {openIframe && (
-        <iframe
+        <div
           ref={ref}
-          width={720}
-          height={450}
           style={{
+            width: "100%",
+            height: "100%",
             position: "fixed",
             transform: "translate(-50%, -50%)",
             zIndex: "9999",
-            borderRadius: "10px",
             top: "50%",
             left: "50%",
             border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          title={item.title}
-          src={item.link}
-        />
+          onClick={() => {
+            setOpenIframe(false);
+          }}
+        >
+          <iframe
+            width={720}
+            height={450}
+            style={{
+              border: "none",
+              borderRadius: "10px",
+            }}
+            title={item.title}
+            src={item.link}
+          />
+        </div>
       )}
       <Modal
         title="Add a card"
