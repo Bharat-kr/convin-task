@@ -1,40 +1,40 @@
 import axios from "axios";
 import {
-  FETCH_USERS_FAILURE,
-  FETCH_USERS_REQUEST,
-  FETCH_USERS_SUCCESS,
-} from "./userTypes";
+  FETCH_CARDS_REQUEST,
+  FETCH_CARDS_SUCCESS,
+  FETCH_CARDS_FAILURE,
+} from "./cardTypes";
 
-export const fetchUsersRequest = () => {
+export const fetchCardsRequest = () => {
   return {
-    type: FETCH_USERS_REQUEST,
+    type: FETCH_CARDS_REQUEST,
   };
 };
-export const fetchUsersSuccess = (users) => {
+export const fetchCardsSuccess = (users) => {
   return {
-    type: FETCH_USERS_SUCCESS,
+    type: FETCH_CARDS_SUCCESS,
     payload: users,
   };
 };
-export const fetchUsersFailure = (error) => {
+export const fetchCardsFailure = (error) => {
   return {
-    type: FETCH_USERS_FAILURE,
+    type: FETCH_CARDS_FAILURE,
     payload: error,
   };
 };
 
-export const fetchUsers = () => {
+export const fetchCards = () => {
   return (dispatch) => {
-    dispatch(fetchUsersRequest);
+    dispatch(fetchCardsRequest);
     axios
       .get("https://jsonplaceholder.typicode.com/users")
       .then((response) => {
         const users = response.data;
-        dispatch(fetchUsersSuccess(users));
+        dispatch(fetchCardsSuccess(users));
       })
       .catch((error) => {
         const errorMsg = error.message;
-        dispatch(fetchUsersFailure(errorMsg));
+        dispatch(fetchCardsFailure(errorMsg));
       });
   }; //what is important here is this has not to be pure it can have side effects such as async api calls
 };
