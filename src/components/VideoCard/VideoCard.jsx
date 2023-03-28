@@ -1,41 +1,87 @@
-import { Card, Checkbox } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Divider,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Typography,
+} from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import styles from "./VideoCard.module.scss";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import useOutsideClickHandler from "../../utils/useOutsideClickHandler";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteCard, updateCard } from "../../redux/cards/cardActions";
 
+const { Text } = Typography;
 const { Meta } = Card;
-
 const VideoCard = ({ item }) => {
+  let loading = useSelector((state) => state.card.loading);
+  const dispatch = useDispatch();
+  const tagsList = useSelector((state) => state.card.buckets);
+  const [items, setItems] = useState(tagsList);
   const [open, setOpen] = useState(false);
+  const [openIframe, setOpenIframe] = useState(false);
+  const [data, setData] = useState(item);
   const ref = useRef();
-  useOutsideClickHandler(
-    ref,
-    () => {
-      setOpen(false);
-    },
-    false
-  );
+  useOutsideClickHandler(ref, () => {
+    setOpen(false);
+  });
+  // just adding new item
+  const [name, setName] = useState("");
+  const inputRef = useRef(null);
+
+  const onNameChange = (event) => {
+    setName(event.target.value);
+  };
+  const addItem = (e) => {
+    e.preventDefault();
+    setItems([...items, name]);
+    setName("");
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+  // just adding new item
+  const showModal = () => {
+    setOpen(true);
+  };
+  const handleOk = () => {
+    dispatch(updateCard(data.id, data));
+    setOpen(false);
+  };
+  const handleCancel = () => {
+    setOpen(false);
+  };
   return (
     <div className={styles.card}>
       <Card
         hoverable={true}
         actions={[
           <Checkbox />,
-          <EditOutlined key="edit" />,
-          <DeleteOutlined key="delete" />,
+          <EditOutlined key="edit" onClick={showModal} />,
+          <DeleteOutlined
+            key="delete"
+            onClick={() => {
+              dispatch(deleteCard(item.id));
+            }}
+          />,
         ]}
       >
         <Meta
           title={item.title}
           description={item.link}
-          onClick={() => setOpen(true)}
+          onClick={() => setOpenIframe(true)}
         />
       </Card>
-      {open && (
+      {openIframe && (
         <iframe
           ref={ref}
-          width={630}
+          width={720}
           height={450}
           style={{
             position: "fixed",
@@ -50,6 +96,69 @@ const VideoCard = ({ item }) => {
           src={item.link}
         />
       )}
+      <Modal
+        title="Add a card"
+        open={open}
+        onOk={handleOk}
+        confirmLoading={loading}
+        onCancel={handleCancel}
+      >
+        <Text strong>Name</Text>
+        <Input
+          placeholder="Jhon Doe"
+          value={data.title}
+          onChange={(e) => {
+            setData({ ...data, title: e.target.value });
+          }}
+        />
+        <Text strong>Link</Text>
+        <Input
+          placeholder="http://example.com"
+          value={data.link}
+          onChange={(e) => {
+            setData({ ...data, link: e.target.value });
+          }}
+        />
+        <Text strong>Type</Text>
+        <br />
+        <Select
+          style={{
+            width: 470,
+          }}
+          value={data.bucket}
+          placeholder="Select Type"
+          dropdownRender={(menu) => (
+            <>
+              {menu}
+              <Divider
+                style={{
+                  margin: "8px 0",
+                }}
+              />
+              <Space
+                style={{
+                  padding: "0 8px 4px",
+                }}
+              >
+                <Input
+                  placeholder="Please enter bucket"
+                  ref={inputRef}
+                  value={name}
+                  onChange={onNameChange}
+                />
+                <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                  Add item
+                </Button>
+              </Space>
+            </>
+          )}
+          options={items.slice(1).map((item) => ({
+            label: item,
+            value: item,
+          }))}
+          onSelect={(e) => setData({ ...data, bucket: e })}
+        />
+      </Modal>
     </div>
   );
 };
