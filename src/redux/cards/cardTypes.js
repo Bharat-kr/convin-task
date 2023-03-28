@@ -1,3 +1,5 @@
 export const CREATE_CARD = "CREATE_CARD";
 export const DELETE_CARD = "DELETE_CARD";
 export const UPDATE_CARD = "UPDATE_CARD";
+export const CREATE_HISTORY = "CREATE_HISTORY";
+export const DELETE_MULTIPLE_CARDS = "DELETE_MULTIPLE_CARDS";

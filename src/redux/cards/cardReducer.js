@@ -1,8 +1,13 @@
-import { CREATE_CARD, DELETE_CARD, UPDATE_CARD } from "./cardTypes";
+import {
+  CREATE_CARD,
+  DELETE_CARD,
+  UPDATE_CARD,
+  CREATE_HISTORY,
+  DELETE_MULTIPLE_CARDS,
+} from "./cardTypes";
 import { v4 as uuidv4 } from "uuid";
 
 const initialState = {
-  loading: false,
   cards: [
     {
       id: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
@@ -18,7 +23,7 @@ const initialState = {
     },
   ],
   buckets: ["All", "Entertainment", "E-Sports"],
-  error: "",
+  history: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -53,6 +58,27 @@ const reducer = (state = initialState, action) => {
         buckets: state.buckets.includes(action.payload.data.bucket)
           ? [...state.buckets]
           : [...state.buckets, action.payload.data.bucket],
+      };
+
+    case CREATE_HISTORY:
+      return {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            title: action.payload.title,
+            link: action.payload.link,
+            createdAt: new Date(),
+            id: action.payload.id,
+          },
+        ],
+      };
+    case DELETE_MULTIPLE_CARDS:
+      return {
+        ...state,
+        cards: state.cards.filter((element) => {
+          return !action.payload.includes(element.id);
+        }),
       };
     default:
       return state;

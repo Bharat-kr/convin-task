@@ -1,32 +1,14 @@
 import React from "react";
 import Navbar from "../../components/navbar/Navbar";
-import { Avatar, List } from "antd";
-import { useEffect, useState } from "react";
+import { List, Typography } from "antd";
 import styles from "./History.module.scss";
+import { useSelector } from "react-redux";
+
+const { Text } = Typography;
 
 const History = () => {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
-  const loadMoreData = () => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
-    fetch(
-      "https://randomuser.me/api/?results=10&inc=name,gender,email,nat,picture&noinfo"
-    )
-      .then((res) => res.json())
-      .then((body) => {
-        setData([...data, ...body.results]);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  };
-  useEffect(() => {
-    loadMoreData();
-  }, []);
+  const history = useSelector((state) => state.card.history);
+
   return (
     <div className={styles.history}>
       <Navbar />
@@ -40,14 +22,17 @@ const History = () => {
           }}
         >
           <List
-            dataSource={data}
+            dataSource={history}
+            style={{
+              cursor: "pointer",
+            }}
             renderItem={(item) => (
-              <List.Item key={item.email}>
+              <List.Item key={item.id}>
                 <List.Item.Meta
-                  title={<a href="https://ant.design">{item.name.last}</a>}
-                  description={item.email}
+                  title={<Text>{item.title}</Text>}
+                  description={item.link}
                 />
-                <div>Content</div>
+                <div>{item.createdAt.toLocaleString()}</div>
               </List.Item>
             )}
           />

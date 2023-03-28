@@ -15,11 +15,16 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import useOutsideClickHandler from "../../utils/useOutsideClickHandler";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCard, updateCard } from "../../redux/cards/cardActions";
+import {
+  createHistory,
+  deleteCard,
+  updateCard,
+} from "../../redux/cards/cardActions";
 
 const { Text } = Typography;
 const { Meta } = Card;
-const VideoCard = ({ item }) => {
+
+const VideoCard = ({ item, setSelectedCards }) => {
   let loading = useSelector((state) => state.card.loading);
   const dispatch = useDispatch();
   const tagsList = useSelector((state) => state.card.buckets);
@@ -62,7 +67,21 @@ const VideoCard = ({ item }) => {
       <Card
         hoverable={true}
         actions={[
-          <Checkbox />,
+          <Checkbox
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedCards((prev) => [...prev, item.id]);
+              } else {
+                setSelectedCards((prev) => {
+                  let arr = [];
+                  prev.forEach((element) => {
+                    if (element !== item.id) arr.push(element);
+                  });
+                  return arr;
+                });
+              }
+            }}
+          />,
           <EditOutlined key="edit" onClick={showModal} />,
           <DeleteOutlined
             key="delete"
@@ -75,7 +94,10 @@ const VideoCard = ({ item }) => {
         <Meta
           title={item.title}
           description={item.link}
-          onClick={() => setOpenIframe(true)}
+          onClick={() => {
+            setOpenIframe(true);
+            dispatch(createHistory(item));
+          }}
         />
       </Card>
       {openIframe && (

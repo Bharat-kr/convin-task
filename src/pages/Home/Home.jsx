@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../components/navbar/Navbar";
 import VideoCard from "../../components/VideoCard/VideoCard";
 import styles from "./Home.module.scss";
-import { Space, Tag } from "antd";
-import { useSelector } from "react-redux";
+import { FloatButton, Space, Tag } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteOutlined } from "@ant-design/icons";
+import { deleteMultiple } from "../../redux/cards/cardActions";
 
 const { CheckableTag } = Tag;
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const [selectedCards, setSelectedCards] = useState([]);
   let cardsList = useSelector((state) => state.card.cards);
   const tagsList = useSelector((state) => state.card.buckets);
   const [selectedTags, setSelectedTags] = useState([tagsList[0]]);
@@ -47,10 +51,24 @@ const Home = () => {
               }
             })
             .map((item, idx) => {
-              return <VideoCard item={item} key={item.title + idx} />;
+              return (
+                <VideoCard
+                  item={item}
+                  key={item.title + idx}
+                  setSelectedCards={setSelectedCards}
+                />
+              );
             })}
         </div>
       </div>
+      {selectedCards.length > 0 && (
+        <FloatButton
+          icon={<DeleteOutlined />}
+          onClick={() => {
+            dispatch(deleteMultiple(selectedCards));
+          }}
+        />
+      )}
     </div>
   );
 };
